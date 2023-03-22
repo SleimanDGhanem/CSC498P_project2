@@ -1,6 +1,6 @@
 import requests
 import sys
-
+import re
 
 def request(url):
     try:
@@ -15,18 +15,13 @@ def request(url):
 def getSubdomains(url):
     with open("subdomains_dictionary.bat") as file:
         output = open("subdomains_output.bat", "w")
-        for line in file:
-            word = line.strip()
-            target = word + "." + url
-            response = request(target)
+        for string in file:
+            word = string.strip()
+            result = word + "." + url
+            response = request(result)
             if response:
-                print(target)
-                output.write(target + "\n")
+                output.write(result + "\n")
         output.close()
-        
-url = sys.argv[1]
-print("the website you are searching through is " + url)
-test = request(url)
 
 def returnDirectories(url):
     with open("dirs_dictionary.bat") as file:
@@ -38,11 +33,6 @@ def returnDirectories(url):
             if check_directories:
                 output.write(result + "\n")
         output.close()
-
-if test:
-    returnDirectories(url)
-else :
-    print("url not found, please retry")	
  
 def domainTest(domain, url):
     result = url.find(domain)
@@ -50,3 +40,40 @@ def domainTest(domain, url):
         return True
     else:
         return False   
+def returnFiles(url):
+    with open("files_output.bat", "a") as output:
+        response = request(url)
+        html = response.content.decode("utf-8")
+        sites = re.findall('(?:href=")(.*?)"', html)
+        for file in sites:
+
+            test = request(file)
+            if test:
+                if test.status_code == 200:
+                    checkDomain = domainTest(url, file)
+                    if checkDomain:
+                        returnFiles(file)
+                    else:
+                        continue
+            else:
+                try:
+                    test = requests.get(file)
+                    if not test:
+                        website = url + "/" + file
+                        output.write(site + "\n")
+                except requests.exceptions.ConnectionError:
+                    pass
+                except requests.exceptions.InvalidURL:
+                    pass
+                except requests.exceptions.MissingSchema:
+                    website = url + "/" + file
+                    output.write(website + "\n")
+
+url = sys.argv[1]
+response = request(url)
+if response:
+    open("files_output.bat", "w").close()
+    returnFiles(url)
+else:
+    print("url not found, please try again")
+    sys.exit(0)
