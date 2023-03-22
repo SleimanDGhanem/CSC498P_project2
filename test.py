@@ -24,3 +24,11 @@ def getSubdomains(url):
                 output.write(target + "\n")
         output.close()
         
+url = sys.argv[1]
+print("the website you are searching through is " + url)
+test = request(url)
+
+if test:
+    getSubdomains(url)
+else :
+    print("invalid url!")	
