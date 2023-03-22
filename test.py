@@ -43,4 +43,10 @@ if test:
     returnDirectories(url)
 else :
     print("url not found, please retry")	
-    
+ 
+def domainTest(domain, url):
+    result = url.find(domain)
+    if result != -1:
+        return True
+    else:
+        return False   
