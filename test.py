@@ -14,7 +14,7 @@ def request(url):
 
 def getSubdomains(url):
     with open("subdomains_dictionary.bat") as file:
-        output = open("subdomins_output.bat", "w")
+        output = open("subdomains_output.bat", "w")
         for line in file:
             word = line.strip()
             target = word + "." + url
@@ -28,7 +28,19 @@ url = sys.argv[1]
 print("the website you are searching through is " + url)
 test = request(url)
 
+def returnDirectories(url):
+    with open("dirs_dictionary.bat") as file:
+        output = open("directories_output.bat", "w")
+        for string in file:
+            word = string.strip()
+            result = url + "/" + word
+            check_directories = request(result)
+            if check_directories:
+                output.write(result + "\n")
+        output.close()
+
 if test:
-    getSubdomains(url)
+    returnDirectories(url)
 else :
-    print("invalid url!")	
+    print("url not found, please retry")	
+    
